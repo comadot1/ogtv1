@@ -1,7 +1,7 @@
 from tool import ToolUtil
 
 from .setup import *
-from .tvchak_handle import Tvchak
+from .ogtv_handle import ogtv
 
 
 class ModuleMain(PluginModuleBase):
@@ -18,7 +18,7 @@ class ModuleMain(PluginModuleBase):
     
     def process_command(self, command, arg1, arg2, arg3, req):
         if command == 'broad_list':
-            ret = {'ret':'success', 'ch_list':Tvchak.ch_list()}
+            ret = {'ret':'success', 'ch_list':ogtv.ch_list()}
         elif command == 'play_url':
             url = ToolUtil.make_apikey_url(f"/{P.package_name}/api/url.m3u8?ch_id={arg1}")
             ret = {'ret':'success', 'data':url}
@@ -28,15 +28,15 @@ class ModuleMain(PluginModuleBase):
     def process_api(self, sub, req):
         try:
             if sub == 'm3u':
-                return Tvchak.make_m3u()
+                return ogtv.make_m3u()
             elif sub == 'url.m3u8':
-                mode, data = Tvchak.get_m3u8(req.args.get('ch_id'))
+                mode, data = ogtv.get_m3u8(req.args.get('ch_id'))
                 if mode == 'text':
                     return data
                 else:
                     return redirect(data)
             elif sub == 'segment.ts':
-                return Tvchak.segment(req)
+                return ogtv.segment(req)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')
             P.logger.error(traceback.format_exc())
